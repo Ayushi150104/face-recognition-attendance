@@ -1,0 +1,7 @@
+streamlit
+face-recognition
+face-recognition-models
+cmake
+dlib
+numpy
+Pillow
