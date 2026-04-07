@@ -4,3 +4,5 @@ streamlit
 face-recognition
 numpy
 Pillow
+opencv-python-headless
+pandas
