@@ -1,9 +1,5 @@
-setuptools
-wheel
 streamlit
+face-recognition
+opencv-python-headless
 numpy
 Pillow
-opencv-python-headless
-pandas
-dlib-bin
-face_recognition @ git+https://github.com/thetoby9944/face_recognition
