@@ -3,5 +3,3 @@ face-recognition
 opencv-python-headless
 numpy
 Pillow
-cmake
-dlib

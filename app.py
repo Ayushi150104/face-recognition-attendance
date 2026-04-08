@@ -1,17 +1,20 @@
 import streamlit as st
 import face_recognition
 
-# Page config
+# =========================
+# PAGE CONFIG
+# =========================
 st.set_page_config(
     page_title="Face Recognition Attendance",
     page_icon="📸",
     layout="centered"
 )
 
-# Theme toggle
+# =========================
+# THEME TOGGLE
+# =========================
 theme = st.toggle("🌙 Dark Theme", value=True)
-toggle_text_color = "#ffffff" if theme else "#111827"
-# Theme colors
+
 if theme:
     bg_gradient = "linear-gradient(90deg, #0f172a, #1e293b, #020617)"
     text_color = "white"
@@ -25,43 +28,16 @@ else:
     border_color = "rgba(0,0,0,0.08)"
     shadow_color = "rgba(0,0,0,0.10)"
 
-# Custom CSS
+# =========================
+# CUSTOM CSS
+# =========================
 st.markdown(f"""
-<style>   
-            /* Header buttons white */
-[data-testid="stHeader"] {{
-            background: transparent !important;
-            box-shadow: none !important;
-}}
-
-[data-testid="stHeader"] button {{
-    padding-top:2rem !important;
-}}
-
-[data-testid="stHeader"] svg {{
-    fill: white !important;
-}}
-                     
-/* Full page background */
+<style>
 .stApp {{
     background: {bg_gradient};
     color: {text_color};
 }}
 
-/* Deploy button text always white */
-button[kind="header"] {{
-    color: white !important;
-}}
-
-button[kind="header"] * {{
-    color: white !important;
-}}
-
-button[kind="header"] svg {{
-    fill: white !important;
-}}
-
-/* Main title */
 .title {{
     text-align: center;
     font-size: 42px;
@@ -71,7 +47,6 @@ button[kind="header"] svg {{
     margin-top: 10px;
 }}
 
-/* Glass box */
 .subtitle-box {{
     width: 100%;
     max-width: 700px;
@@ -80,68 +55,27 @@ button[kind="header"] svg {{
     border-radius: 18px;
     background: {box_bg};
     backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
     border: 1px solid {border_color};
     box-shadow: 0 8px 20px {shadow_color};
     text-align: center;
 }}
 
-/* Bold box text */
 .subtitle-text {{
     font-size: 22px;
     font-weight: 700;
     color: {text_color};
-    letter-spacing: 0.4px;
 }}
-
-/* Camera input style */
-[data-testid="stCameraInput"] {{
-    border-radius: 20px;
-    overflow: hidden;
-}}
-
-/* Camera button text always white */
-[data-testid="stCameraInput"] button {{
-    color: white !important;
-}}
-
-[data-testid="stCameraInput"] button p {{
-    color: white !important;
-}}
-
-[data-testid="stCameraInput"] * {{
-    color: white !important;
-}}
-
-/* Success glass */
-.stSuccess {{
-    background: {box_bg} !important;
-    backdrop-filter: blur(15px) !important;
-    border-radius: 15px !important;
-    border: 1px solid {border_color} !important;
-    color: {text_color} !important;
-}}
-
-/* Error glass */
-.stError {{
-    background: rgba(255,0,0,0.08) !important;
-    backdrop-filter: blur(15px) !important;
-    border-radius: 15px !important;
-    border: 1px solid {border_color} !important;
-    color: {text_color} !important;
-}}
-
 </style>
 """, unsafe_allow_html=True)
 
-
-# Title
+# =========================
+# TITLE
+# =========================
 st.markdown(
     '<div class="title">📸 Face Recognition Attendance</div>',
     unsafe_allow_html=True
 )
 
-# First box
 st.markdown(
     """
     <div class="subtitle-box">
@@ -153,7 +87,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Second box
 st.markdown(
     """
     <div class="subtitle-box">
@@ -165,29 +98,41 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Camera section
-with st.container():
-    uploaded_file = st.camera_input(" ")
+# =========================
+# LOAD KNOWN FACES ONCE
+# =========================
+@st.cache_resource
+def load_known_faces():
+    deb_image = face_recognition.load_image_file("Debalina Jana.jpeg")
+    deb_encoding = face_recognition.face_encodings(deb_image)[0]
 
-    if uploaded_file is not None:
+    ayu_image = face_recognition.load_image_file("Ayushi Choudhary.jpeg")
+    ayu_encoding = face_recognition.face_encodings(ayu_image)[0]
 
+    return [deb_encoding, ayu_encoding], ["Debalina", "Ayushi"]
+
+
+try:
+    known_encodings, known_names = load_known_faces()
+
+except Exception as e:
+    st.error(f"Known face image loading error: {e}")
+    st.stop()
+
+# =========================
+# CAMERA INPUT
+# =========================
+uploaded_file = st.camera_input(" ")
+
+if uploaded_file is not None:
+    try:
         image = face_recognition.load_image_file(uploaded_file)
-
         test_encodings = face_recognition.face_encodings(image)
 
         if len(test_encodings) == 0:
             st.error("❌ No face detected")
         else:
             test_encoding = test_encodings[0]
-
-            deb_image = face_recognition.load_image_file("Debalina Jana.jpeg")
-            deb_encoding = face_recognition.face_encodings(deb_image)[0]
-
-            ayu_image = face_recognition.load_image_file("Ayushi Choudhary.jpeg")
-            ayu_encoding = face_recognition.face_encodings(ayu_image)[0]
-
-            known_encodings = [deb_encoding, ayu_encoding]
-            known_names = ["Debalina", "Ayushi"]
 
             matches = face_recognition.compare_faces(
                 known_encodings,
@@ -202,6 +147,11 @@ with st.container():
             else:
                 st.error("❌ Face Not Matched")
 
-# Footer
+    except Exception as e:
+        st.error(f"Face recognition error: {e}")
+
+# =========================
+# FOOTER
+# =========================
 st.markdown("---")
 st.caption("Built with Python • Streamlit • Face Recognition")
