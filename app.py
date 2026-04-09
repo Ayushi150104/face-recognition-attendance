@@ -1,5 +1,6 @@
 import streamlit as st
 import face_recognition
+import numpy as np
 
 # =========================
 # PAGE CONFIG
@@ -109,7 +110,10 @@ def load_known_faces():
     ayu_image = face_recognition.load_image_file("Ayushi Choudhary.jpeg")
     ayu_encoding = face_recognition.face_encodings(ayu_image)[0]
 
-    return [deb_encoding, ayu_encoding], ["Debalina", "Ayushi"]
+    shreya_image = face_recognition.load_image_file("Shreya Shree.jpeg")
+    shreya_encoding = face_recognition.face_encodings(shreya_image)[0]
+
+    return [deb_encoding, ayu_encoding, shreya_encoding], ["Debalina", "Ayushi", "Shreya"]
 
 
 try:
@@ -126,6 +130,8 @@ uploaded_file = st.camera_input(" ")
 
 if uploaded_file is not None:
     try:
+        import numpy as np
+
         image = face_recognition.load_image_file(uploaded_file)
         test_encodings = face_recognition.face_encodings(image)
 
@@ -136,13 +142,22 @@ if uploaded_file is not None:
 
             matches = face_recognition.compare_faces(
                 known_encodings,
+                test_encoding,
+                tolerance=0.45
+            )
+
+            face_distances = face_recognition.face_distance(
+                known_encodings,
                 test_encoding
             )
 
-            if True in matches:
-                matched_index = matches.index(True)
+            best_match_index = np.argmin(face_distances)
+
+ 
+
+            if matches[best_match_index]:
                 st.success(
-                    f"✅ Attendance Marked | {known_names[matched_index]}"
+                    f"✅ Attendance Marked | {known_names[best_match_index]}"
                 )
             else:
                 st.error("❌ Face Not Matched")

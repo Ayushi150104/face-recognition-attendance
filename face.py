@@ -12,8 +12,11 @@ Debalina_encoding = face_recognition.face_encodings(Debalina_image)[0]
 Ayushi_image = face_recognition.load_image_file("Ayushi Choudhary.jpeg")
 Ayushi_encoding = face_recognition.face_encodings(Ayushi_image)[0]
 
-known_face_encodings = [Debalina_encoding, Ayushi_encoding]
-known_face_names = ["Debalina", "Ayushi"]
+Shreya_image = face_recognition.load_image_file("Shreya Shree.jpeg")
+Shreya_encoding = face_recognition.face_encodings(Shreya_image)[0]
+
+known_face_encodings = [Debalina_encoding, Ayushi_encoding, Shreya_encoding]
+known_face_names = ["Debalina", "Ayushi", "Shreya"]
 
 students = known_face_names.copy()
 
